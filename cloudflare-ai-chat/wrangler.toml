@@ -16,5 +16,3 @@ new_sqlite_classes = ["ChatRoom"]
 [ai]
 binding = "AI"
 
-
-
