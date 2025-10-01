@@ -1,0 +1,338 @@
+<!-- <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cloudflare AI Chat</title>
+<style>
+  body { font-family: sans-serif; margin: 24px; }
+  #chat { max-width: 780px; margin: 0 auto; }
+  .bubble { padding: 10px 12px; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
+  .user { background: #eef; align-self: flex-end; }
+  .assistant { background: #f6f6f6; }
+  .row { display: flex; gap: 8px; }
+  #msgs { display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<div id="chat">
+  <h2>Cloudflare Workers AI • Llama 3.3</h2>
+  <div id="msgs"></div>
+  <div class="row">
+    <input id="inp" placeholder="Ask something..." style="flex:1;padding:10px" />
+    <button id="send">Send</button>
+  </div>
+</div>
+
+<script>
+    const inp = document.getElementById("inp");
+    const send = document.getElementById("send");
+    const msgs = document.getElementById("msgs");
+    let sessionId = localStorage.getItem("sessionId") || null;
+  
+    function add(role, text) {
+      const div = document.createElement("div");
+      div.className = "bubble " + (role === "user" ? "user" : "assistant");
+      div.textContent = text;
+      msgs.appendChild(div);
+      div.scrollIntoView({ behavior: "smooth" });
+      return div;
+    }
+  
+    async function chat(text) {
+      add("user", text);
+      const assistant = add("assistant", "…");
+  
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ prompt: text, sessionId }),
+      });
+  
+      const sid = res.headers.get("x-session-id");
+      if (sid) { sessionId = sid; localStorage.setItem("sessionId", sid); }
+  
+      if (!res.body) {
+        assistant.textContent = "Error: no response body";
+        return;
+      }
+  
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let full = "";
+  
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+  
+        // Parse SSE: lines starting with "data: "
+        chunk.split("\n").forEach(line => {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6).trim();
+            if (!data || data === "ok" || data === "[DONE]") return;
+  
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.response !== undefined) {
+                full += parsed.response;
+                assistant.textContent = full;  // ✅ Show AI response progressively
+              }
+            } catch {
+              // ignore parse errors on partial chunks
+            }
+          }
+        });
+      }
+    }
+  
+    send.onclick = () => {
+      const text = inp.value.trim();
+      if (text) chat(text);
+      inp.value = "";
+    };
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") send.click(); });
+  </script>
+  
+</body>
+</html> -->
+<!-- <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cloudflare AI Chat</title>
+<style>
+  body { font-family: sans-serif; margin: 24px; }
+  #chat { max-width: 780px; margin: 0 auto; }
+  .bubble { padding: 10px 12px; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
+  .user { background: #eef; align-self: flex-end; }
+  .assistant { background: #f6f6f6; }
+  .row { display: flex; gap: 8px; }
+  #msgs { display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<div id="chat">
+  <h2>Cloudflare Workers AI • Llama 3.3</h2>
+  <div id="msgs"></div>
+  <div class="row">
+    <input id="inp" placeholder="Ask something..." style="flex:1;padding:10px" />
+    <button id="send">Send</button>
+  </div>
+</div>
+
+<script>
+  const inp = document.getElementById("inp");
+  const send = document.getElementById("send");
+  const msgs = document.getElementById("msgs");
+  let sessionId = localStorage.getItem("sessionId") || null;
+
+  function add(role, text) {
+    const div = document.createElement("div");
+    div.className = "bubble " + (role === "user" ? "user" : "assistant");
+    div.textContent = text;
+    msgs.appendChild(div);
+    div.scrollIntoView({ behavior: "smooth" });
+    return div;
+  }
+
+  async function chat(text) {
+    add("user", text);
+    const assistant = add("assistant", "…");
+
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ prompt: text, sessionId }),
+    });
+
+    const sid = res.headers.get("x-session-id");
+    if (sid) { sessionId = sid; localStorage.setItem("sessionId", sid); }
+
+    if (!res.body) {
+      assistant.textContent = "Error: no response body";
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let full = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n"); // SSE message separator
+      buffer = parts.pop(); // keep leftover
+
+      for (const msg of parts) {
+        let eventType = "message";
+        let data = "";
+
+        msg.split("\n").forEach(line => {
+          if (line.startsWith("event:")) {
+            eventType = line.slice(6).trim();
+          } else if (line.startsWith("data:")) {
+            data += line.slice(5).trim();
+          }
+        });
+
+        if (!data) continue;
+
+        try {
+          const parsed = JSON.parse(data);
+
+          if (eventType === "token" && parsed.response) {
+            full += parsed.response;
+            assistant.textContent = full;  // live update
+          }
+
+          if (eventType === "done") {
+            assistant.textContent = full || "(no reply)";
+          }
+
+          if (eventType === "error") {
+            assistant.textContent = "⚠️ " + (parsed.error || "Unknown error");
+          }
+        } catch (err) {
+          console.warn("Bad SSE data:", data);
+        }
+      }
+    }
+  }
+
+  send.onclick = () => {
+    const text = inp.value.trim();
+    if (text) chat(text);
+    inp.value = "";
+  };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") send.click(); });
+</script>
+</body>
+</html> -->
+
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cloudflare AI Chat</title>
+<style>
+  body { font-family: sans-serif; margin: 24px; }
+  #chat { max-width: 780px; margin: 0 auto; }
+  .bubble { padding: 10px 12px; border-radius: 12px; margin: 8px 0; white-space: pre-wrap; }
+  .user { background: #eef; align-self: flex-end; }
+  .assistant { background: #f6f6f6; }
+  .row { display: flex; gap: 8px; margin-top: 8px; }
+  #msgs { display: flex; flex-direction: column; gap: 4px; }
+  label { font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="chat">
+  <h2>Cloudflare Workers AI • Chat</h2>
+  <div id="msgs"></div>
+  <div class="row">
+    <input id="inp" placeholder="Ask something..." style="flex:1;padding:10px" />
+    <button id="send">Send</button>
+  </div>
+  <div style="margin-top:8px;">
+    <label>
+      <input type="checkbox" id="streamToggle" checked />
+      Stream responses
+    </label>
+  </div>
+</div>
+
+<script>
+  const inp = document.getElementById("inp");
+  const send = document.getElementById("send");
+  const msgs = document.getElementById("msgs");
+  const streamToggle = document.getElementById("streamToggle");
+  let sessionId = localStorage.getItem("sessionId") || null;
+
+  function add(role, text) {
+    const div = document.createElement("div");
+    div.className = "bubble " + (role === "user" ? "user" : "assistant");
+    div.textContent = text;
+    msgs.appendChild(div);
+    div.scrollIntoView({ behavior: "smooth" });
+    return div;
+  }
+
+  async function chat(text) {
+    add("user", text);
+    const assistant = add("assistant", "…");
+    const useStream = streamToggle.checked;
+
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ prompt: text, sessionId, stream: useStream }),
+    });
+
+    const sid = res.headers.get("x-session-id");
+    if (sid) { sessionId = sid; localStorage.setItem("sessionId", sid); }
+
+    if (!res.body) {
+      assistant.textContent = "Error: no response body";
+      return;
+    }
+
+    if (useStream) {
+      // --- Streaming SSE ---
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let full = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+
+          const data = line.slice(5).trim();
+          if (!data || data === "ok" || data === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.response) {
+              full += parsed.response;
+              assistant.textContent = full; // progressively update
+            }
+          } catch (err) {
+            console.warn("Could not parse:", data, err);
+          }
+        }
+      }
+    } else {
+      // --- Non-streaming JSON ---
+      try {
+        const json = await res.json();
+        assistant.textContent = json.response || JSON.stringify(json);
+      } catch (err) {
+        assistant.textContent = "Error parsing JSON response";
+      }
+    }
+  }
+
+  send.onclick = () => {
+    const text = inp.value.trim();
+    if (text) chat(text);
+    inp.value = "";
+  };
+
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") send.click(); });
+</script>
+</body>
+</html>
+
+
