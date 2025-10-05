@@ -18,10 +18,11 @@ It supports **persistent conversation memory**, optional **streaming responses**
 ## 📸 Screenshots
 
 ### ✅ Local Development Preview
-![Cloudflare Workers AI Screenshot](./.assets/Cloudfare%20Workers%20AI.png)
+![Cloudflare Workers AI Screenshot](./Cloudfare%20Workers%20AI.png)
 
 ### 💬 Conversation Example
-![Cloudflare Workers AI Chat Screenshot](./.assets/Cloudfare%20Workers%20Ai%20Chat.png)
+![Cloudflare Workers AI Chat Screenshot](./Cloudfare%20Workers%20Ai%20Chat.png)
+
 
 ## 🛠️ Tech Stack
 - **Frontend**: HTML + CSS + JavaScript
