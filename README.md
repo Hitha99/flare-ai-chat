@@ -3,6 +3,8 @@
 An **AI-powered chat application** built with **Cloudflare Workers AI**, **Durable Objects**, and a lightweight **chat frontend**.  
 It supports **persistent conversation memory**, optional **streaming responses**, and is ready for future extensions like **voice input**.  
 
+ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.workers.dev/
+
 ---
 
 ## 🚀 Features
@@ -12,8 +14,6 @@ It supports **persistent conversation memory**, optional **streaming responses**
 - 🔄 **Streaming responses** (Server-Sent Events) or full-response mode.
 - 🌍 Easy deployment on **Cloudflare Workers & Pages**.
 - 🎤 Extendable with **voice input (Web Speech API or Realtime API)**.
-
-ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.workers.dev/
 
 ---
 
