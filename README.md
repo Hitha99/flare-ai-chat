@@ -1,7 +1,7 @@
 # ☁️ Cloudflare Workers AI · Chat
 
 An **AI-powered chat application** built with **Cloudflare Workers AI**, **Durable Objects**, and a lightweight **chat frontend**.  
-It supports **persistent conversation memory**, optional **streaming responses**, and is ready for future extensions like **voice input**.  
+It supports **persistent conversation memory**, optional **streaming responses**, and  **voice input**.  
 
 ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.workers.dev/
 
@@ -79,12 +79,6 @@ The frontend saves the session ID in localStorage → conversations continue sea
 
 Old messages are trimmed when exceeding the configured MAX_TURNS
 
-🔮 Future Enhancements
-
 🎤 Voice input using Web Speech API or Cloudflare’s Realtime API
 
-📱 Fully responsive mobile UI
 
-🔀 Support for multiple LLMs (Mistral, GPT, etc.)
-
-💾 Export / save conversation history
