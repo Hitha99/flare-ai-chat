@@ -19,7 +19,7 @@ ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.
 
 ## 📸 Screenshots
 
-### ✅ Local Development Preview
+### ✅ App Preview
 ![Cloudflare Workers AI Screenshot](./Cloudfare%20Workers%20AI.png)
 
 ### 💬 Conversation Example
