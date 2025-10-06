@@ -11,7 +11,6 @@ ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.
 - ⚡ **Cloudflare Workers AI** with `@cf/meta/llama-3-8b-instruct`.
 - 🗂️ **Durable Objects** for session memory & persistence.
 - 💬 **Chat UI** built with HTML, CSS, and vanilla JS.
-- 🔄 **Streaming responses** (Server-Sent Events) or full-response mode.
 - 🌍 Easy deployment on **Cloudflare Workers & Pages**.
 - 🎤 Extendable with **voice input (Web Speech API or Realtime API)**.
 
