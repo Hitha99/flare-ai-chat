@@ -1,7 +1,7 @@
 # ☁️ Cloudflare Workers AI · Chat
 
 An **AI-powered chat application** built with **Cloudflare Workers AI**, **Durable Objects**, and a lightweight **chat frontend**.  
-It supports **persistent conversation memory**, optional **streaming responses**, and  **voice input**.  
+It supports **persistent conversation memory** and  **voice input**.  
 
 ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.workers.dev/
 
