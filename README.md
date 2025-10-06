@@ -13,6 +13,8 @@ It supports **persistent conversation memory**, optional **streaming responses**
 - 🌍 Easy deployment on **Cloudflare Workers & Pages**.
 - 🎤 Extendable with **voice input (Web Speech API or Realtime API)**.
 
+ACCESS THE FULLY FUNCTIONING APP HERE - https://cloudflare-ai-chat.hithavgowder.workers.dev/
+
 ---
 
 ## 📸 Screenshots
@@ -68,9 +70,6 @@ Enable your free workers.dev subdomain
 Deploy with Wrangler
 npx wrangler deploy
 
-
-Your app will be live at:
-👉 https://cloudflare-ai-chat.<your-subdomain>.workers.dev
 
 🧠 Memory & State
 
